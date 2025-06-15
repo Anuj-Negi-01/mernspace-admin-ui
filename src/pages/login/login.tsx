@@ -13,34 +13,42 @@ import { LockFilled, UserOutlined, LockOutlined } from "@ant-design/icons";
 import Logo from "../../components/icons/Logo";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { Credentials } from "../../types";
-import { login, self } from "../../http/api";
+import { login, self, logout } from "../../http/api";
 import { useAuthStore } from "../../store";
-
+import { usePermision } from "../../hooks/usePermision";
 
 const loginUser = async (credentials: Credentials) => {
   const { data } = await login(credentials);
   return data;
 };
 
-const getSelf = async() => {
-  const { data } = await self()
+const getSelf = async () => {
+  const { data } = await self();
   return data;
-}
+};
 
 function LoginPage() {
-  const { setUser } = useAuthStore()
-  const {  refetch } = useQuery({
-    queryKey: ['self'],
+  const { isAllowed } = usePermision();
+  const { setUser, logout: logoutFromStore } = useAuthStore();
+  const { refetch } = useQuery({
+    queryKey: ["self"],
     queryFn: getSelf,
-    enabled: false
-  })
+    enabled: false,
+  });
 
   const { mutate, isPending, isError, error } = useMutation({
     mutationKey: ["login"],
     mutationFn: loginUser,
     onSuccess: async () => {
       const selfDataPromise = await refetch();
-      setUser(selfDataPromise.data)
+      // logout or redirect to client ui
+      // window.location.href="clent ui url"
+      if (!isAllowed(selfDataPromise.data)) {
+        await logout();
+        logoutFromStore();
+        return;
+      }
+      setUser(selfDataPromise.data);
     },
   });
 
