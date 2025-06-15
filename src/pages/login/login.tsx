@@ -7,8 +7,8 @@ import {
   Button,
   Flex,
   Alert,
+  Card
 } from "antd";
-import { Card } from "antd";
 import { LockFilled, UserOutlined, LockOutlined } from "@ant-design/icons";
 import Logo from "../../components/icons/Logo";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -36,6 +36,14 @@ function LoginPage() {
     enabled: false,
   });
 
+  const { mutate: logoutMutate } = useMutation({
+    mutationKey: ["logout"],
+    mutationFn: logout,
+    onSuccess: async () => {
+      logoutFromStore();
+    }
+  })
+
   const { mutate, isPending, isError, error } = useMutation({
     mutationKey: ["login"],
     mutationFn: loginUser,
@@ -44,8 +52,7 @@ function LoginPage() {
       // logout or redirect to client ui
       // window.location.href="clent ui url"
       if (!isAllowed(selfDataPromise.data)) {
-        await logout();
-        logoutFromStore();
+        logoutMutate()
         return;
       }
       setUser(selfDataPromise.data);
