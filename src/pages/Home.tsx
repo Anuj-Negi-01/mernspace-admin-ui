@@ -1,7 +1,17 @@
-function HomePage() {
+import { Typography } from "antd"
+import { useAuthStore } from "../store"
 
+
+const { Title } = Typography;
+
+
+function HomePage() {
+  const { user } = useAuthStore()
   return (
-    <h1>Hello world</h1>
+    <div>
+      <Title level={3}>Welcome, { user?.firstname} 😊</Title>
+      
+    </div>
   )
 }
 
