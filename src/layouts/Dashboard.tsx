@@ -90,7 +90,7 @@ function Dashboard() {
             }}
           >
             <Flex gap="middle" align="start" justify="space-between">
-              <Badge text="Admin" status="success" />
+              <Badge text={ user.role === 'admin' ? "Admin" : user.tenant?.name} status="success" />
               <Space size={20}>
                 <Badge dot={true}>
                   <BellFilled />
