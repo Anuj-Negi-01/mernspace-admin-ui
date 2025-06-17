@@ -14,37 +14,46 @@ import { logout } from "../http/api";
 
 const { Header, Content, Sider, Footer } = Layout;
 
-const items = [
-  {
-    key: "/",
-    icon: <Icon component={Home} />,
-    label: <NavLink to="/">Home</NavLink>,
-  },
-  {
-    key: "/users",
-    icon: <Icon component={UserIcon} />,
-    label: <NavLink to="/users">Users</NavLink>,
-  },
-  {
-    key: "/restaurants",
-    icon: <Icon component={FoodIcon} />,
-    label: <NavLink to="/restaurants">Restaurants</NavLink>,
-  },
-  {
-    key: "/products",
-    icon: <Icon component={BasketIcon} />,
-    label: <NavLink to="/products">Products</NavLink>,
-  },
-  {
-    key: "/promos",
-    icon: <Icon component={GiftIcon} />,
-    label: <NavLink to="/promos">Promos</NavLink>,
-  },
-];
+
+
+function getItems(role: string) {
+  const baseItems = [
+    {
+      key: "/",
+      icon: <Icon component={Home} />,
+      label: <NavLink to="/">Home</NavLink>,
+    },
+    {
+      key: "/restaurants",
+      icon: <Icon component={FoodIcon} />,
+      label: <NavLink to="/restaurants">Restaurants</NavLink>,
+    },
+    {
+      key: "/products",
+      icon: <Icon component={BasketIcon} />,
+      label: <NavLink to="/products">Products</NavLink>,
+    },
+    {
+      key: "/promos",
+      icon: <Icon component={GiftIcon} />,
+      label: <NavLink to="/promos">Promos</NavLink>,
+    },
+  ];
+
+  if (role === 'admin') {
+    baseItems.splice(1, 0, {
+        key: "/users",
+        icon: <Icon component={UserIcon} />,
+        label: <NavLink to="/users">Users</NavLink>,
+      })
+      return baseItems
+  }
+  return baseItems
+}
+
 
 function Dashboard() {
   const { user, logout: logoutFromStore } = useAuthStore();
-
   const [collapsed, setCollapsed] = useState(false);
 
   const {
@@ -62,6 +71,7 @@ function Dashboard() {
   if (user === null) {
     return <Navigate to="/auth/login" replace={true} />;
   }
+  const items = getItems(user?.role)
   return (
     <div>
       <Layout style={{ minHeight: "100vh" }}>
@@ -90,27 +100,29 @@ function Dashboard() {
             }}
           >
             <Flex gap="middle" align="start" justify="space-between">
-              <Badge text={ user.role === 'admin' ? "Admin" : user.tenant?.name} status="success" />
+              <Badge text={user.role === 'admin' ? "Admin" : user.tenant?.name} status="success" />
               <Space size={20}>
                 <Badge dot={true}>
                   <BellFilled />
                 </Badge>
-                <Dropdown menu={{ items: [{
+                <Dropdown menu={{
+                  items: [{
                     key: '/',
                     label: 'Logout',
                     onClick: () => logoutMutate()
-                  }] }} placement="bottomRight" arrow>
-                    <Avatar style={{
-                      background: "#0096FF",
-                      color: "#fff"
-                    }}>
-                      {
-                        user && (
-                          user.firstname.charAt(0)
-                        )
-                      }
-                    </Avatar>
-                  </Dropdown>
+                  }]
+                }} placement="bottomRight" arrow>
+                  <Avatar style={{
+                    background: "#0096FF",
+                    color: "#fff"
+                  }}>
+                    {
+                      user && (
+                        user.firstname.charAt(0)
+                      )
+                    }
+                  </Avatar>
+                </Dropdown>
               </Space>
             </Flex>
           </Header>
