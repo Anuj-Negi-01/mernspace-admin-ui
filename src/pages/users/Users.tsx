@@ -1,11 +1,14 @@
-import { Breadcrumb, Flex, Spin, Table } from "antd";
-import { RightOutlined } from "@ant-design/icons";
+import { Breadcrumb, Button, Drawer, Flex, Spin, Table, Space } from "antd";
+import { RightOutlined, PlusOutlined } from "@ant-design/icons";
 import { Link, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getUsers } from "../../http/api";
 import type { User } from "../../types";
 import { useAuthStore } from "../../store";
 import UsersFilter from "./UsersFilter";
+import { useState } from "react";
+
+
 
 const columns = [
   {
@@ -38,6 +41,7 @@ const columns = [
 ];
 
 function Users() {
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const {
     data: users,
     isLoading,
@@ -68,7 +72,10 @@ function Users() {
           },
         ]}
       />
-      <UsersFilter />
+      <UsersFilter onFilterChange={(filtername: string, filterValue: string) => console.log('Filter', filtername + ' ' + filterValue)}
+        >
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => setDrawerOpen(true)}>Create User</Button>
+      </UsersFilter>
       {isLoading && (
         <Flex
           align="center"
@@ -83,8 +90,21 @@ function Users() {
       <Table
         columns={columns}
         dataSource={users}
+        rowKey={'id'}
         style={{ marginTop: "20px" }}
       />
+
+      <Drawer title={<h2>Create a new user</h2>} width={720} destroyOnHidden closable onClose={() => setDrawerOpen(false)} open={drawerOpen}
+      extra={
+        <Space>
+          <Button>Cancel</Button>
+          <Button type="primary">Submit</Button>
+        </Space>
+      } 
+        >
+      <h1>Tesing</h1>
+      <h1>Tesing</h1>
+      </Drawer>
     </>
   );
 }

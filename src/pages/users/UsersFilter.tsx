@@ -1,17 +1,26 @@
-import { Card, Col, Row,Input, Select, Button } from "antd"
-import { PlusOutlined } from "@ant-design/icons"
+import { Card, Col, Row,Input, Select } from "antd"
 
-function UsersFilter() {
+
+type UsersFilterProp = {
+  onFilterChange: (filtername: string, filterValue: string) => void,
+  children: React.ReactNode
+}
+
+function UsersFilter({ onFilterChange, children }: UsersFilterProp) {
   return (
     <Card style={{ marginTop: '20px'}}>
       <Row justify="space-between">
         <Col span={16}>
             <Row gutter={20}>
               <Col span={8}>
-                <Input.Search placeholder="Search"/>
+                <Input.Search placeholder="Search"
+                allowClear={true} 
+                onChange={(e) => onFilterChange('searchFilter', e.target.value)} />
               </Col>
               <Col span={8}>
-                <Select style={{ width: '100%'}} placeholder="Select Role" allowClear={true}>
+                <Select style={{ width: '100%'}} placeholder="Select Role" allowClear={true}
+                onChange={(selectedItem) => onFilterChange('roleQuery', selectedItem)}
+                >
                   <Select.Option value="admin">
                     Admin
                   </Select.Option>
@@ -24,7 +33,9 @@ function UsersFilter() {
                 </Select>
               </Col>
               <Col span={8}>
-              <Select style={{ width: '100%'}} placeholder="Select Status" allowClear={true}>
+              <Select style={{ width: '100%'}} placeholder="Select Status" allowClear={true}
+              onChange={(selectedItem) => onFilterChange('statusFilter', selectedItem)}
+              >
                   <Select.Option value="banned">
                     Banned
                   </Select.Option>
@@ -36,7 +47,7 @@ function UsersFilter() {
             </Row>
         </Col>
         <Col span={8} style={{ display: 'flex', justifyContent: 'end'}}>
-        <Button type="primary" icon={<PlusOutlined />}>Create User</Button>
+        { children }
         </Col>
       </Row>
     </Card>
