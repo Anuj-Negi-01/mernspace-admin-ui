@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getUsers } from "../../http/api";
 import type { User } from "../../types";
 import { useAuthStore } from "../../store";
+import UsersFilter from "./UsersFilter";
 
 const columns = [
   {
@@ -67,6 +68,7 @@ function Users() {
           },
         ]}
       />
+      <UsersFilter />
       {isLoading && (
         <Flex
           align="center"
