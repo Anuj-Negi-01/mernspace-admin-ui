@@ -6,7 +6,7 @@ import { useState } from "react";
 import Logo from "../components/icons/Logo";
 import Home from "../components/icons/Home";
 import UserIcon from "../components/icons/UserIcon";
-import FoodIcon from "../components/icons/foodIcon";
+import FoodIcon from "../components/icons/FoodIcon";
 import BasketIcon from "../components/icons/BasketIcon";
 import GiftIcon from "../components/icons/GiftIcon";
 import { useMutation } from "@tanstack/react-query";
