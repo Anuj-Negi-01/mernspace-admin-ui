@@ -7,7 +7,7 @@ import type { User } from "../../types";
 import { useAuthStore } from "../../store";
 import UsersFilter from "./UsersFilter";
 import { useState } from "react";
-import UserForm from "../forms/UserForm";
+import UserForm from "./forms/UserForm";
 
 
 

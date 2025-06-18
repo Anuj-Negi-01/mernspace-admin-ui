@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, Col, Form, Input, Row, Select, Space } from "antd";
-import { getTenants } from "../../http/api";
-import type { Tenant } from "../../types";
+import { getTenants } from "../../../http/api";
+import type { Tenant } from "../../../types";
 
 function UserForm() {
   const { data: tenants } = useQuery({
