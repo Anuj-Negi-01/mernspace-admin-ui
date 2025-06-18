@@ -1,4 +1,4 @@
-import { Breadcrumb, Button, Drawer, Flex, Spin, Table, Space } from "antd";
+import { Breadcrumb, Button, Drawer, Flex, Spin, Table, Space, theme, Form } from "antd";
 import { RightOutlined, PlusOutlined } from "@ant-design/icons";
 import { Link, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -7,6 +7,7 @@ import type { User } from "../../types";
 import { useAuthStore } from "../../store";
 import UsersFilter from "./UsersFilter";
 import { useState } from "react";
+import UserForm from "../forms/UserForm";
 
 
 
@@ -41,6 +42,7 @@ const columns = [
 ];
 
 function Users() {
+  const { token: { colorBgLayout } } = theme.useToken()
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const {
     data: users,
@@ -100,10 +102,13 @@ function Users() {
           <Button>Cancel</Button>
           <Button type="primary">Submit</Button>
         </Space>
-      } 
-        >
-      <h1>Tesing</h1>
-      <h1>Tesing</h1>
+      }
+      styles={{ body: { background: colorBgLayout }}} 
+      >
+        <Form layout="vertical">
+          <UserForm />
+        </Form>
+          
       </Drawer>
     </>
   );

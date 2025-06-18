@@ -7,7 +7,7 @@ type tenantsFilterProp = {
 
 function TenantsFilter({ children, onFilterChange }: tenantsFilterProp) {
   return (
-     <Card>
+     <Card style={{ marginTop: '20px'}}>
             <Row justify="space-between">
                 <Col span={16}>
                     <Row gutter={20}>

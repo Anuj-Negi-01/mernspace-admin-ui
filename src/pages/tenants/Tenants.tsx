@@ -65,7 +65,7 @@ function Tenants() {
         <Button type="primary" icon={<PlusOutlined />}
         onClick={() => setDrawerOpen(true)}
         >
-          Create Tenant
+          Create Restaurant
         </Button>
       </TenantsFilter>
       {isLoading && (
