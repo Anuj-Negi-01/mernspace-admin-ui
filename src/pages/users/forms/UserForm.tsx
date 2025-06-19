@@ -79,10 +79,6 @@ function UserForm() {
                     {
                       required: true,
                       message: "Password is required",
-                    },
-                    {
-                      len: 8,
-                      message: 'Password must be more than 7 chars'
                     }
                   ]}
                 >

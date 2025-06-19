@@ -11,6 +11,15 @@ export type User = {
   email: string;
 };
 
+export type createUserData = {
+  firstname: string;
+  lastname: string;
+  password: string;
+  role: string;
+  email: string;
+  tenant: number;
+};
+
 export type Tenant = {
   id: number;
   name: string;
