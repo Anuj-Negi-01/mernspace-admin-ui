@@ -1,7 +1,7 @@
-import { Breadcrumb, Button, Drawer, Flex, Spin, Table, Space, theme, Form } from "antd";
+import { Breadcrumb, Button, Drawer, Flex, Spin, Table, Space, theme, Form, Typography } from "antd";
 import { RightOutlined, PlusOutlined } from "@ant-design/icons";
 import { Link, Navigate } from "react-router-dom";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createUser, getUsers } from "../../http/api";
 import type { createUserData, User } from "../../types";
 import { useAuthStore } from "../../store";
@@ -53,7 +53,7 @@ function Users() {
   })
   const {
     data: users,
-    isLoading,
+    isFetching,
     isError,
     error,
   } = useQuery({
@@ -64,6 +64,7 @@ function Users() {
       ).toString()
       return getUsers(queryString).then((res) => res.data);
     },
+    placeholderData: keepPreviousData
   });
 
   const { user } = useAuthStore();
@@ -92,7 +93,8 @@ function Users() {
 
   return (
     <>
-      <Breadcrumb
+      <Flex justify="space-between">
+          <Breadcrumb
         separator={<RightOutlined />}
         items={[
           {
@@ -103,22 +105,18 @@ function Users() {
           },
         ]}
       />
+      {isFetching && (
+          <Spin size="small" />
+      )}
+      {isError && <Typography.Text strong type="danger">
+        {error.message}</Typography.Text>}
+      </Flex>
       <UsersFilter onFilterChange={(filtername: string, filterValue: string) => console.log('Filter', filtername + ' ' + filterValue)}
         >
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setDrawerOpen(true)}>Create User</Button>
       </UsersFilter>
-      {isLoading && (
-        <Flex
-          align="center"
-          gap="middle"
-          justify="center"
-          style={{ height: "50vh" }}
-        >
-          <Spin size="large" />
-        </Flex>
-      )}
-      {isError && <div>{error.message}</div>}
-      <Table
+      {
+        users && <Table
         columns={columns}
         dataSource={users?.data}
         rowKey={'id'}
@@ -137,6 +135,7 @@ function Users() {
           }
         }}
       />
+      }
 
       <Drawer title={<h2>Create a new user</h2>} width={720} destroyOnHidden closable onClose={() => {
         form.resetFields()
