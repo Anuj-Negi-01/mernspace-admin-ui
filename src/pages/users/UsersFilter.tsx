@@ -8,7 +8,7 @@ type UsersFilterProp = {
 
 function UsersFilter({ onFilterChange, children }: UsersFilterProp) {
   return (
-    <Card style={{ marginTop: '20px'}}>
+    <Card style={{ marginTop: '16px'}}>
       <Row justify="space-between">
         <Col span={16}>
             <Row gutter={20}>

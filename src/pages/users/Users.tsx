@@ -8,6 +8,7 @@ import { useAuthStore } from "../../store";
 import UsersFilter from "./UsersFilter";
 import { useState } from "react";
 import UserForm from "./forms/UserForm";
+import { CURRENT_PAGE, PER_PAGE } from "../../constant";
 
 
 
@@ -46,15 +47,22 @@ function Users() {
   const [form] = Form.useForm()
   const { token: { colorBgLayout } } = theme.useToken()
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+  const [ queryParams, setQueryParam ] = useState({
+    currentPage: CURRENT_PAGE,
+    perPage: PER_PAGE
+  })
   const {
     data: users,
     isLoading,
     isError,
     error,
   } = useQuery({
-    queryKey: ["users"],
+    queryKey: ["users", queryParams],
     queryFn: () => {
-      return getUsers().then((res) => res.data);
+      const queryString = new URLSearchParams(
+        queryParams as unknown as Record<string, string>
+      ).toString()
+      return getUsers(queryString).then((res) => res.data);
     },
   });
 
@@ -76,9 +84,11 @@ function Users() {
     form.resetFields()
 }
 
+
  if(user?.role !== 'admin'){
     return <Navigate to="/" replace={true} />
   }
+
 
   return (
     <>
@@ -110,9 +120,22 @@ function Users() {
       {isError && <div>{error.message}</div>}
       <Table
         columns={columns}
-        dataSource={users}
+        dataSource={users?.data}
         rowKey={'id'}
-        style={{ marginTop: "20px" }}
+        style={{ marginTop: "16px" }}
+        pagination={{
+          total: users?.total,
+          pageSize: queryParams.perPage,
+          current: queryParams.currentPage,
+          onChange: (page) => {
+            setQueryParam((prev) => {
+              return {
+                ...prev,
+                currentPage: page
+              }
+            })
+          }
+        }}
       />
 
       <Drawer title={<h2>Create a new user</h2>} width={720} destroyOnHidden closable onClose={() => {
