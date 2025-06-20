@@ -1,4 +1,4 @@
-import { Card, Col, Input, Row } from "antd"
+import { Card, Col, Input, Row, Form } from "antd"
 
 type tenantsFilterProp = {
     children: React.ReactNode
@@ -11,10 +11,12 @@ function TenantsFilter({ children }: tenantsFilterProp) {
                 <Col span={16}>
                     <Row gutter={20}>
                         <Col span={12}>
-                            <Input.Search
+                            <Form.Item name="q">
+                                <Input.Search
                                 allowClear={true}
                                 placeholder="Search"
                             />
+                            </Form.Item>
                         </Col>
                     </Row>
                 </Col>

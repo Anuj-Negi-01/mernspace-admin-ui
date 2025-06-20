@@ -7,7 +7,7 @@ import TenantsFilter from "./TenantsFilter";
 import { useState } from "react";
 import { useAuthStore } from "../../store";
 import TenantForm from "./forms/TenantForm";
-import type { CreateTenantData } from "../../types";
+import type { CreateTenantData, FieldData } from "../../types";
 import { CURRENT_PAGE, PER_PAGE } from "../../constant";
 
 const columns = [
@@ -30,6 +30,7 @@ const columns = [
 
 function Tenants() {
   const [ form ] = Form.useForm()
+  const [filterForm] = Form.useForm()
   const queryClient = useQueryClient()
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [queryParams, setQueryParams] = useState({
@@ -69,6 +70,15 @@ function Tenants() {
     setDrawerOpen(false)
   }
 
+  const onFieldsChange = async(changedFields: FieldData[]) => {
+    const changedFilterFields = changedFields
+            .map((item) => ({
+                [item.name[0]]: item.value,
+            }))
+            .reduce((acc, item) => ({ ...acc, ...item }), {});
+    setQueryParams((prev) => ({ ...prev, ...changedFilterFields }))
+  }
+
   const { user } = useAuthStore();
 
     if (user?.role !== 'admin') {
@@ -95,7 +105,8 @@ function Tenants() {
       )}
       {isError && <Typography.Text strong>{error.message}</Typography.Text>}
       </Flex>
-      <TenantsFilter
+      <Form form={filterForm} onFieldsChange={onFieldsChange}>
+        <TenantsFilter
       >
         <Button type="primary" icon={<PlusOutlined />}
         onClick={() => setDrawerOpen(true)}
@@ -103,6 +114,7 @@ function Tenants() {
           Create Restaurant
         </Button>
       </TenantsFilter>
+      </Form>
       <Table
         columns={columns}
         dataSource={tenants?.data}
