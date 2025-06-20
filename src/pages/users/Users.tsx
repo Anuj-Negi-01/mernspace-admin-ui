@@ -13,6 +13,7 @@ import { debounce } from "lodash";
 
 
 
+
 const columns = [
   {
     title: "ID",
@@ -41,6 +42,18 @@ const columns = [
     dataIndex: "email",
     key: "email",
   },
+  {
+    title: "Restaurant",
+    dataIndex: "tenant",
+    key: "tenant",
+    render: (_text: string, record: User) => {
+      return (
+        <div>
+          {record.tenant?.name}
+        </div>
+      )
+    }
+  }
 ];
 
 function Users() {
