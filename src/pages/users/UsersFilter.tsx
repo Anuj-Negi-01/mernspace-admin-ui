@@ -2,7 +2,7 @@ import { Card, Col, Row,Input, Select, Form } from "antd"
 
 
 type UsersFilterProp = {
-  children: React.ReactNode
+  children: React.ReactNode,
 }
 
 function UsersFilter({ children }: UsersFilterProp) {

@@ -3,12 +3,13 @@ import { RightOutlined, PlusOutlined } from "@ant-design/icons";
 import { Link, Navigate } from "react-router-dom";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createUser, getUsers } from "../../http/api";
-import type { createUserData, User } from "../../types";
+import type { createUserData, FieldData, User } from "../../types";
 import { useAuthStore } from "../../store";
 import UsersFilter from "./UsersFilter";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import UserForm from "./forms/UserForm";
 import { CURRENT_PAGE, PER_PAGE } from "../../constant";
+import { debounce } from "lodash";
 
 
 
@@ -87,12 +88,26 @@ function Users() {
     form.resetFields()
 }
 
-const onFilterChange = () => {
-  setQueryParam((prev) => ({
-    ...prev,
-    ...filterForm.getFieldsValue()
-  }))
-}
+  const debouncedQUpdate = useMemo(() => {
+    return debounce((value: string | undefined) => {
+      setQueryParam((prev) => ({...prev, q: value}))
+    }, 1000)
+  }, [])
+
+
+  const onFilterChange = (changedFields: FieldData[]) => {
+        const changedFilterFields = changedFields
+            .map((item) => ({
+                [item.name[0]]: item.value,
+            }))
+            .reduce((acc, item) => ({ ...acc, ...item }), {});
+
+        if ('q' in changedFilterFields) {
+            debouncedQUpdate(changedFilterFields.q);
+        } else {
+            setQueryParam((prev) => ({ ...prev, ...changedFilterFields, currentPage: 1 }));
+        }
+    };
 
 
  if(user?.role !== 'admin'){
@@ -120,7 +135,7 @@ const onFilterChange = () => {
       {isError && <Typography.Text strong type="danger">
         {error.message}</Typography.Text>}
       </Flex>
-      <Form form={filterForm} onFieldsChange={() => onFilterChange()}>
+      <Form form={filterForm} onFieldsChange={onFilterChange}>
         <UsersFilter
         >
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setDrawerOpen(true)}>Create User</Button>
