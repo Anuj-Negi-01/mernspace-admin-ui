@@ -1,25 +1,27 @@
-import { Card, Col, Row,Input, Select } from "antd"
+import { Card, Col, Row,Input, Select, Form } from "antd"
 
 
 type UsersFilterProp = {
-  onFilterChange: (filtername: string, filterValue: string) => void,
   children: React.ReactNode
 }
 
-function UsersFilter({ onFilterChange, children }: UsersFilterProp) {
+function UsersFilter({ children }: UsersFilterProp) {
   return (
     <Card style={{ marginTop: '16px'}}>
       <Row justify="space-between">
         <Col span={16}>
             <Row gutter={20}>
               <Col span={8}>
-                <Input.Search placeholder="Search"
+                <Form.Item name="q">
+                  <Input.Search placeholder="Search"
                 allowClear={true} 
-                onChange={(e) => onFilterChange('searchFilter', e.target.value)} />
+                 />
+                </Form.Item>
               </Col>
               <Col span={8}>
-                <Select style={{ width: '100%'}} placeholder="Select Role" allowClear={true}
-                onChange={(selectedItem) => onFilterChange('roleQuery', selectedItem)}
+                <Form.Item name="role">
+                  <Select style={{ width: '100%'}} placeholder="Select Role" allowClear={true}
+                
                 >
                   <Select.Option value="admin">
                     Admin
@@ -31,8 +33,9 @@ function UsersFilter({ onFilterChange, children }: UsersFilterProp) {
                     Customer
                   </Select.Option>
                 </Select>
+                </Form.Item>
               </Col>
-              <Col span={8}>
+              {/* <Col span={8}>
               <Select style={{ width: '100%'}} placeholder="Select Status" allowClear={true}
               onChange={(selectedItem) => onFilterChange('statusFilter', selectedItem)}
               >
@@ -43,7 +46,7 @@ function UsersFilter({ onFilterChange, children }: UsersFilterProp) {
                     Active
                   </Select.Option>
                   </Select>
-              </Col>
+              </Col> */}
             </Row>
         </Col>
         <Col span={8} style={{ display: 'flex', justifyContent: 'end'}}>

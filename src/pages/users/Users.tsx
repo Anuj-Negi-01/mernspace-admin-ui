@@ -45,6 +45,7 @@ const columns = [
 function Users() {
   const queryClient = useQueryClient()
   const [form] = Form.useForm()
+  const [filterForm] = Form.useForm()
   const { token: { colorBgLayout } } = theme.useToken()
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [ queryParams, setQueryParam ] = useState({
@@ -59,8 +60,9 @@ function Users() {
   } = useQuery({
     queryKey: ["users", queryParams],
     queryFn: () => {
+      const filteredParams = Object.fromEntries(Object.entries(queryParams).filter((item) => !!item[1]))
       const queryString = new URLSearchParams(
-        queryParams as unknown as Record<string, string>
+        filteredParams as unknown as Record<string, string>
       ).toString()
       return getUsers(queryString).then((res) => res.data);
     },
@@ -83,6 +85,13 @@ function Users() {
     userMutate(form.getFieldsValue())
     setDrawerOpen(false);
     form.resetFields()
+}
+
+const onFilterChange = () => {
+  setQueryParam((prev) => ({
+    ...prev,
+    ...filterForm.getFieldsValue()
+  }))
 }
 
 
@@ -111,10 +120,12 @@ function Users() {
       {isError && <Typography.Text strong type="danger">
         {error.message}</Typography.Text>}
       </Flex>
-      <UsersFilter onFilterChange={(filtername: string, filterValue: string) => console.log('Filter', filtername + ' ' + filterValue)}
+      <Form form={filterForm} onFieldsChange={() => onFilterChange()}>
+        <UsersFilter
         >
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setDrawerOpen(true)}>Create User</Button>
       </UsersFilter>
+      </Form>
       {
         users && <Table
         columns={columns}
