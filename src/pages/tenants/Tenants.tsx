@@ -1,13 +1,14 @@
-import { Breadcrumb, Button, Drawer, Flex, Form, Space, Spin, Table, theme } from "antd";
+import { Breadcrumb, Button, Drawer, Flex, Form, Space, Spin, Table, theme, Typography } from "antd";
 import { RightOutlined, PlusOutlined } from "@ant-design/icons";
 import { Link, Navigate } from "react-router-dom";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createTenat, getTenants } from "../../http/api";
 import TenantsFilter from "./TenantsFilter";
 import { useState } from "react";
 import { useAuthStore } from "../../store";
 import TenantForm from "./forms/TenantForm";
 import type { CreateTenantData } from "../../types";
+import { CURRENT_PAGE, PER_PAGE } from "../../constant";
 
 const columns = [
   {
@@ -31,16 +32,24 @@ function Tenants() {
   const [ form ] = Form.useForm()
   const queryClient = useQueryClient()
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [queryParams, setQueryParams] = useState({
+    currentPage: CURRENT_PAGE,
+    perPage: PER_PAGE
+  })
   const {
     data: tenants,
-    isLoading,
+    isFetching,
     isError,
     error,
   } = useQuery({
-    queryKey: ["tenants"],
+    queryKey: ["tenants", queryParams],
     queryFn: () => {
-      return getTenants().then((res) => res.data);
+      const queryString = new URLSearchParams(
+        queryParams as unknown as Record<string, string>
+      ).toString()
+      return getTenants(queryString).then((res) => res.data);
     },
+    placeholderData: keepPreviousData
   });
 
   const { mutate: tenantMutate } = useMutation({
@@ -56,6 +65,7 @@ function Tenants() {
   const onHandleSubmit = async () => {
     await form.validateFields()
     tenantMutate(form.getFieldsValue())
+    form.resetFields()
     setDrawerOpen(false)
   }
 
@@ -68,7 +78,8 @@ function Tenants() {
     const { token : { colorBgLayout }} = theme.useToken()
   return (
     <>
-      <Breadcrumb
+      <Flex justify="space-between">
+        <Breadcrumb
         separator={<RightOutlined />}
         items={[
           {
@@ -79,10 +90,12 @@ function Tenants() {
           },
         ]}
       />
+      {isFetching && (
+          <Spin size="small" />
+      )}
+      {isError && <Typography.Text strong>{error.message}</Typography.Text>}
+      </Flex>
       <TenantsFilter
-        onFilterChange={(filterName, filterValue) =>
-          console.log(filterName + " " + filterValue)
-        }
       >
         <Button type="primary" icon={<PlusOutlined />}
         onClick={() => setDrawerOpen(true)}
@@ -90,22 +103,24 @@ function Tenants() {
           Create Restaurant
         </Button>
       </TenantsFilter>
-      {isLoading && (
-        <Flex
-          align="center"
-          gap="middle"
-          justify="center"
-          style={{ height: "50vh" }}
-        >
-          <Spin size="large" />
-        </Flex>
-      )}
-      {isError && <div>{error.message}</div>}
       <Table
         columns={columns}
-        dataSource={tenants}
+        dataSource={tenants?.data}
         rowKey={"id"}
         style={{ marginTop: "20px" }}
+        pagination={{
+          total: tenants?.total,
+          pageSize: queryParams.perPage,
+          current: queryParams.currentPage,
+          onChange: (page) => {
+            setQueryParams((prev) => {
+              return {
+                ...prev,
+                currentPage: page
+              }
+            })
+          }
+        }}
       />
       <Drawer
         title={<h2>Create a new restaurant</h2>}
