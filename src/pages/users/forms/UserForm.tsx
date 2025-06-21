@@ -3,11 +3,11 @@ import { Card, Col, Form, Input, Row, Select, Space } from "antd";
 import { getTenants } from "../../../http/api";
 import type { Tenant } from "../../../types";
 
-function UserForm() {
+function UserForm({ isEditMode = false }: { isEditMode: boolean }) {
   const { data: tenants } = useQuery({
     queryKey: ["tenants"],
     queryFn: () => {
-      return getTenants().then((res) => res.data);
+      return getTenants(`perPage=100&currentPage=1`).then((res) => res.data);
     },
   });
 
@@ -69,7 +69,9 @@ function UserForm() {
               </Col>
             </Row>
           </Card>
-          <Card title="Security info">
+          {
+            !isEditMode && (
+              <Card title="Security info">
             <Row>
               <Col span={12}>
                 <Form.Item
@@ -87,6 +89,8 @@ function UserForm() {
               </Col>
             </Row>
           </Card>
+            )
+          }
           <Card title="Role info">
             <Row gutter={20}>
               <Col span={12}>
@@ -101,6 +105,7 @@ function UserForm() {
                   ]}
                 >
                   <Select
+                    id="selectBoxInUserForm"
                     size="large"
                     style={{ width: "100%" }}
                     allowClear={true}
@@ -130,7 +135,7 @@ function UserForm() {
                     placeholder="Select Restaurant"
                   >
                     {tenants &&
-                      tenants.map((tenant: Tenant) => (
+                      tenants.data.map((tenant: Tenant) => (
                         <Select.Option key={tenant.id} value={tenant.id}>
                           {tenant.name}
                         </Select.Option>

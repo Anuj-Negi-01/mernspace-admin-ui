@@ -11,9 +11,13 @@ export const logout = () => api.post("/auth/logout");
 export const getUsers = (queryString: string) =>
   api.get(`/users?${queryString}`);
 
-export const getTenants = (queryString: string) => api.get(`/tenants?${queryString}`);
+export const getTenants = (queryString: string) =>
+  api.get(`/tenants?${queryString}`);
 
 export const createUser = (user: createUserData) => api.post("/users", user);
 
 export const createTenat = (tenant: CreateTenantData) =>
   api.post("/tenants", tenant);
+
+export const updateUser = (user: createUserData, id: string) =>
+  api.patch(`/users/${id}`, user);

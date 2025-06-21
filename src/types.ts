@@ -4,7 +4,7 @@ export type Credentials = {
 };
 
 export type User = {
-  id: number;
+  id: string;
   firstname: string;
   lastname: string;
   role: string;
