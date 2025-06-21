@@ -1,4 +1,8 @@
-import type { CreateTenantData, createUserData, Credentials } from "../types";
+import type {
+  CreateTenantData,
+  createUserData,
+  Credentials,
+} from "../types";
 import { api } from "./client";
 
 export const login = (credentials: Credentials) =>
@@ -21,3 +25,6 @@ export const createTenat = (tenant: CreateTenantData) =>
 
 export const updateUser = (user: createUserData, id: string) =>
   api.patch(`/users/${id}`, user);
+
+export const updateTenant = (tenant: CreateTenantData, id: number) =>
+  api.patch(`/tenants/${id}`, tenant);

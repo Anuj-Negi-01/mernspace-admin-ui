@@ -2,12 +2,12 @@ import { Breadcrumb, Button, Drawer, Flex, Form, Space, Spin, Table, theme, Typo
 import { RightOutlined, PlusOutlined } from "@ant-design/icons";
 import { Link, Navigate } from "react-router-dom";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createTenat, getTenants } from "../../http/api";
+import { createTenat, getTenants, updateTenant } from "../../http/api";
 import TenantsFilter from "./TenantsFilter";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuthStore } from "../../store";
 import TenantForm from "./forms/TenantForm";
-import type { CreateTenantData, FieldData } from "../../types";
+import type { CreateTenantData, FieldData, Tenant } from "../../types";
 import { CURRENT_PAGE, PER_PAGE } from "../../constant";
 import { debounce } from "lodash";
 
@@ -34,6 +34,7 @@ function Tenants() {
   const [filterForm] = Form.useForm()
   const queryClient = useQueryClient()
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [currentTenat, setCurrentTenant] = useState<Tenant | null>(null)
   const [queryParams, setQueryParams] = useState({
     currentPage: CURRENT_PAGE,
     perPage: PER_PAGE
@@ -64,9 +65,25 @@ function Tenants() {
     }
   })
 
+  const { mutate: updateTenantMutate } = useMutation({
+    mutationKey: ["update-tenant"],
+    mutationFn: (data: CreateTenantData) => {
+      return updateTenant(data, currentTenat!.id).then((res) => res.data)
+    },
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ['tenants']})
+    }
+  })
+
   const onHandleSubmit = async () => {
     await form.validateFields()
-    tenantMutate(form.getFieldsValue())
+    const isEditMode = !!currentTenat
+    if(isEditMode){
+      await updateTenantMutate(form.getFieldsValue())
+    } else {
+      await tenantMutate(form.getFieldsValue())
+    }
+    setCurrentTenant(null)
     form.resetFields()
     setDrawerOpen(false)
   }
@@ -85,6 +102,13 @@ function Tenants() {
             .reduce((acc, item) => ({ ...acc, ...item }), {});
     debounecdQUpdate(changedFilterFields.q)
   }
+
+  useEffect(() => {
+    if(currentTenat){
+      setDrawerOpen(true)
+      form.setFieldsValue(currentTenat)
+    }
+  }, [currentTenat, form])
 
   const { user } = useAuthStore();
 
@@ -116,14 +140,31 @@ function Tenants() {
         <TenantsFilter
       >
         <Button type="primary" icon={<PlusOutlined />}
-        onClick={() => setDrawerOpen(true)}
+        onClick={() => {
+          setDrawerOpen(true)
+          setCurrentTenant(null)
+        }}
         >
           Create Restaurant
         </Button>
       </TenantsFilter>
       </Form>
       <Table
-        columns={columns}
+        columns={[
+          ...columns, 
+          {
+            title: 'Action',
+            render: (_text: string, record: Tenant) => {
+              return (
+                <Button type="link"
+                onClick={() => {
+                  setCurrentTenant(record)
+                }} 
+                >Edit</Button>
+              )
+            }
+          }
+        ]}
         dataSource={tenants?.data}
         rowKey={"id"}
         style={{ marginTop: "20px" }}
@@ -151,7 +192,7 @@ function Tenants() {
         }}
       />
       <Drawer
-        title={<h2>Create a new restaurant</h2>}
+        title={currentTenat ? <h2>Update restaurant</h2> : <h2>Create a new restaurant</h2>}
         width={720}
         closable
         destroyOnHidden
@@ -167,7 +208,9 @@ function Tenants() {
               form.resetFields()
               setDrawerOpen(false)
             }}>Cancel</Button>
-            <Button type="primary" onClick={() => onHandleSubmit()}>Submit</Button>
+            <Button type="primary" onClick={() => onHandleSubmit()}>
+              { currentTenat ? 'Save' : 'Submit' }
+            </Button>
           </Space>
         }
       >
