@@ -138,6 +138,15 @@ function Tenants() {
                 currentPage: page
               }
             })
+          },
+          showTotal: (total: number, range: number[]) => {
+            return (
+              <Typography.Text strong>
+                {
+                  `${range[0]}-${range[1]} of ${total}`
+                }
+              </Typography.Text>
+            )
           }
         }}
       />
