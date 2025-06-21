@@ -24,11 +24,6 @@ function getItems(role: string) {
       label: <NavLink to="/">Home</NavLink>,
     },
     {
-      key: "/restaurants",
-      icon: <Icon component={FoodIcon} />,
-      label: <NavLink to="/restaurants">Restaurants</NavLink>,
-    },
-    {
       key: "/products",
       icon: <Icon component={BasketIcon} />,
       label: <NavLink to="/products">Products</NavLink>,
@@ -45,7 +40,13 @@ function getItems(role: string) {
         key: "/users",
         icon: <Icon component={UserIcon} />,
         label: <NavLink to="/users">Users</NavLink>,
-      })
+      },
+      {
+      key: "/restaurants",
+      icon: <Icon component={FoodIcon} />,
+      label: <NavLink to="/restaurants">Restaurants</NavLink>,
+    },
+    )
       return baseItems
   }
   return baseItems
@@ -87,7 +88,7 @@ function Dashboard() {
           </div>
           <Menu
             theme="light"
-            defaultSelectedKeys={["/"]}
+            defaultSelectedKeys={[location.pathname]}
             mode="inline"
             items={items}
           />
