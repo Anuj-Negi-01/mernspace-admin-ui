@@ -4,6 +4,7 @@ import { getTenants } from "../../../http/api";
 import type { Tenant } from "../../../types";
 
 function UserForm({ isEditMode = false }: { isEditMode: boolean }) {
+  const selectedRole = Form.useWatch('role')
   const { data: tenants } = useQuery({
     queryKey: ["tenants"],
     queryFn: () => {
@@ -74,7 +75,7 @@ function UserForm({ isEditMode = false }: { isEditMode: boolean }) {
               <Row>
                 <Col span={12}>
                   <Form.Item
-                    label="Paasword"
+                    label="Password"
                     name="password"
                     rules={[
                       {
@@ -111,11 +112,13 @@ function UserForm({ isEditMode = false }: { isEditMode: boolean }) {
                   >
                     <Select.Option value="admin">Admin</Select.Option>
                     <Select.Option value="manager">Manager</Select.Option>
-                    <Select.Option value="customer">Customer</Select.Option>
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={12}>
+              {
+                selectedRole === 'manager' && 
+                (
+                  <Col span={12}>
                 <Form.Item
                   label="Restaurant"
                   name="tenantId"
@@ -141,6 +144,8 @@ function UserForm({ isEditMode = false }: { isEditMode: boolean }) {
                   </Select>
                 </Form.Item>
               </Col>
+                )
+              }
             </Row>
           </Card>
         </Space>
