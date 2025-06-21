@@ -69,28 +69,26 @@ function UserForm({ isEditMode = false }: { isEditMode: boolean }) {
               </Col>
             </Row>
           </Card>
-          {
-            !isEditMode && (
-              <Card title="Security info">
-            <Row>
-              <Col span={12}>
-                <Form.Item
-                  label="Paasword"
-                  name="password"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Password is required",
-                    }
-                  ]}
-                >
-                  <Input.Password placeholder="password" size="large" />
-                </Form.Item>
-              </Col>
-            </Row>
-          </Card>
-            )
-          }
+          {!isEditMode && (
+            <Card title="Security info">
+              <Row>
+                <Col span={12}>
+                  <Form.Item
+                    label="Paasword"
+                    name="password"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Password is required",
+                      },
+                    ]}
+                  >
+                    <Input.Password placeholder="password" size="large" />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Card>
+          )}
           <Card title="Role info">
             <Row gutter={20}>
               <Col span={12}>
