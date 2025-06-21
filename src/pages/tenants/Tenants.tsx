@@ -4,11 +4,12 @@ import { Link, Navigate } from "react-router-dom";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createTenat, getTenants } from "../../http/api";
 import TenantsFilter from "./TenantsFilter";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAuthStore } from "../../store";
 import TenantForm from "./forms/TenantForm";
 import type { CreateTenantData, FieldData } from "../../types";
 import { CURRENT_PAGE, PER_PAGE } from "../../constant";
+import { debounce } from "lodash";
 
 const columns = [
   {
@@ -70,13 +71,19 @@ function Tenants() {
     setDrawerOpen(false)
   }
 
+  const debounecdQUpdate = useMemo(() => {
+    return debounce((value: string | undefined) => {
+      setQueryParams((prev) => ({ ...prev, q: value, currentPage: 1 }))
+    }, 1000)
+  }, [])
+
   const onFieldsChange = async(changedFields: FieldData[]) => {
     const changedFilterFields = changedFields
             .map((item) => ({
                 [item.name[0]]: item.value,
             }))
             .reduce((acc, item) => ({ ...acc, ...item }), {});
-    setQueryParams((prev) => ({ ...prev, ...changedFilterFields }))
+    debounecdQUpdate(changedFilterFields.q)
   }
 
   const { user } = useAuthStore();

@@ -103,7 +103,7 @@ function Users() {
 
   const debouncedQUpdate = useMemo(() => {
     return debounce((value: string | undefined) => {
-      setQueryParam((prev) => ({...prev, q: value}))
+      setQueryParam((prev) => ({...prev, q: value, currentPage: 1}))
     }, 1000)
   }, [])
 
