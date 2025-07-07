@@ -1,13 +1,8 @@
-import type {
-  CreateTenantData,
-  createUserData,
-  Credentials,
-} from "../types";
+import type { CreateTenantData, createUserData, Credentials } from "../types";
 import { api } from "./client";
 
-
 export const AUTH_SERVICE = "/api/auth";
-// const CATALOG_SERVICE = "/api/catalog";
+const CATALOG_SERVICE = "/api/catalog";
 
 export const login = (credentials: Credentials) =>
   api.post(`${AUTH_SERVICE}/auth/login`, credentials);
@@ -22,7 +17,8 @@ export const getUsers = (queryString: string) =>
 export const getTenants = (queryString: string) =>
   api.get(`${AUTH_SERVICE}/tenants?${queryString}`);
 
-export const createUser = (user: createUserData) => api.post(`${AUTH_SERVICE}/users`, user);
+export const createUser = (user: createUserData) =>
+  api.post(`${AUTH_SERVICE}/users`, user);
 
 export const createTenant = (tenant: CreateTenantData) =>
   api.post(`${AUTH_SERVICE}/tenants`, tenant);
@@ -32,3 +28,5 @@ export const updateUser = (user: createUserData, id: string) =>
 
 export const updateTenant = (tenant: CreateTenantData, id: number) =>
   api.patch(`${AUTH_SERVICE}/tenants/${id}`, tenant);
+
+export const getCategories = () => api.get(`${CATALOG_SERVICE}/categories`);
