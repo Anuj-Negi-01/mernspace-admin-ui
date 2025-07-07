@@ -1,10 +1,13 @@
-import { Flex, Breadcrumb } from "antd"
-import { RightOutlined } from "@ant-design/icons";
+import { Flex, Breadcrumb, Form, Button } from "antd"
+import { RightOutlined, PlusOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
+import ProductFilter from "./ProductFilter";
 
 function Products() {
+    const [filterForm] = Form.useForm();
   return (
-    <Flex justify="space-between">
+    <>
+      <Flex justify="space-between">
         <Breadcrumb
           separator={<RightOutlined />}
           items={[
@@ -17,6 +20,18 @@ function Products() {
           ]}
         />
       </Flex>
+
+      <Form form={filterForm}>
+        <ProductFilter>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+          >
+            Add Product
+          </Button>
+        </ProductFilter>
+      </Form>
+    </>
   )
 }
 
