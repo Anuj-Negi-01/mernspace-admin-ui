@@ -20,6 +20,7 @@ import { useMemo, useState } from "react";
 import { CURRENT_PAGE, PER_PAGE } from "../../constant";
 import { format } from "date-fns";
 import { debounce } from "lodash";
+import { useAuthStore } from "../../store";
 
 const columns = [
   {
@@ -83,9 +84,12 @@ const columns = [
 function Products() {
   const [filterForm] = Form.useForm();
 
+  const { user } = useAuthStore()
+
   const [queryParams, setQueryParams] = useState({
     currentPage: CURRENT_PAGE,
     perPage: PER_PAGE,
+    tenantId: user!.role === "manager" ? user?.tenant?.id : undefined
   });
 
   const debouncedQUpdate = useMemo(() => {

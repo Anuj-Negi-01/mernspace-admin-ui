@@ -12,6 +12,7 @@ import {
 } from "antd";
 import { getCategories, getTenants } from "../../http/api";
 import type { Category, Tenant } from "../../types";
+import { useAuthStore } from "../../store";
 
 interface ProductFilterProps {
   children: React.ReactNode;
@@ -31,6 +32,8 @@ function ProductFilter({ children }: ProductFilterProps) {
       return getCategories().then((res) => res.data);
     },
   });
+
+  const { user } = useAuthStore();
 
   return (
     <Card style={{ marginTop: "16px" }}>
@@ -58,30 +61,34 @@ function ProductFilter({ children }: ProductFilterProps) {
                 </Select>
               </Form.Item>
             </Col>
+            {user!.role === "admin" && (
+              <Col span={6}>
+                <Form.Item name="tenantId">
+                  <Select
+                    style={{ width: "100%" }}
+                    allowClear={true}
+                    placeholder="Select Restaurant"
+                  >
+                    {restaurants &&
+                      restaurants.data.map((restaurant: Tenant) => (
+                        <Select.Option
+                          value={restaurant.id}
+                          key={restaurant.id}
+                        >
+                          {restaurant.name}
+                        </Select.Option>
+                      ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            )}
             <Col span={6}>
-              <Form.Item name="tenantId">
-                <Select
-                  style={{ width: "100%" }}
-                  allowClear={true}
-                  placeholder="Select Restaurant"
-                >
-                  {restaurants &&
-                    restaurants.data.map((restaurant: Tenant) => (
-                      <Select.Option value={restaurant.id} key={restaurant.id}>
-                        {restaurant.name}
-                      </Select.Option>
-                    ))}
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              
-                <Space>
-                  <Form.Item name="isPublish">
-                    <Switch />
-                  </Form.Item>
-                  <Typography.Text>Show only published</Typography.Text>
-                </Space>
+              <Space>
+                <Form.Item name="isPublish">
+                  <Switch />
+                </Form.Item>
+                <Typography.Text>Show only published</Typography.Text>
+              </Space>
             </Col>
           </Row>
         </Col>
