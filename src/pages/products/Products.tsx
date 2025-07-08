@@ -13,12 +13,13 @@ import {
 import { RightOutlined, PlusOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import ProductFilter from "./ProductFilter";
-import type { Product } from "../../types";
+import type { FieldData, Product } from "../../types";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { getProducts } from "../../http/api";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { CURRENT_PAGE, PER_PAGE } from "../../constant";
 import { format } from "date-fns";
+import { debounce } from "lodash";
 
 const columns = [
   {
@@ -87,13 +88,42 @@ function Products() {
     perPage: PER_PAGE,
   });
 
+  const debouncedQUpdate = useMemo(() => {
+    return debounce((value: string | undefined) => {
+      setQueryParams((prev) => ({
+        ...prev,
+        q: value,
+        currentPage: 1
+      }))
+    }, 1000)
+  }, [])
+
+  const onFilterChange = (changedFields: FieldData[]) => {
+    const changedFilterFields = changedFields.map((item) => (
+      {[item.name[0]]: item.value }
+    )).reduce((acc, item) => ({...acc, ...item}), {})
+
+    if("q" in changedFilterFields){
+      debouncedQUpdate(changedFilterFields.q)
+    } else {
+      setQueryParams((prev) => (
+        {
+          ...prev,
+          ...changedFilterFields,
+          currentPage: 1
+        }
+      )
+    )
+    }
+  };
+
   const {
     data: products,
     isFetching,
     isError,
     error,
   } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["products", queryParams],
     queryFn: async () => {
       const filteredParams = Object.fromEntries(
         Object.entries(queryParams).filter((item) => !!item[1])
@@ -128,7 +158,7 @@ function Products() {
         )}
       </Flex>
 
-      <Form form={filterForm}>
+      <Form form={filterForm} onFieldsChange={onFilterChange}>
         <ProductFilter>
           <Button type="primary" icon={<PlusOutlined />}>
             Add Product
