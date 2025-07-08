@@ -85,9 +85,14 @@ function ProductFilter({ children }: ProductFilterProps) {
             <Col span={6}>
               <Space>
                 <Form.Item name="isPublish">
-                  <Switch />
+                  <Switch defaultChecked={false} />
                 </Form.Item>
-                <Typography.Text>Show only published</Typography.Text>
+                <Typography.Text
+                  strong
+                  style={{ display: "inline-block", marginBottom: "22px" }}
+                >
+                  Show only published
+                </Typography.Text>
               </Space>
             </Col>
           </Row>
