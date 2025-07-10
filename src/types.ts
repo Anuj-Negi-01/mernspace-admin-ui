@@ -37,9 +37,17 @@ export type FieldData = {
   value?: string;
 };
 
+export interface priceConfiguration {
+  [key: string]: {
+    priceType: "base" | "additional";
+    availableOptions: string[];
+  };
+}
+
 export type Category = {
   _id: string;
   name: string;
+  priceConfiguration: priceConfiguration;
 };
 
 export type Product = {

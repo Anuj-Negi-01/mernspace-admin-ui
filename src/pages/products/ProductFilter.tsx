@@ -40,12 +40,12 @@ function ProductFilter({ children }: ProductFilterProps) {
       <Row justify="space-between">
         <Col span={16}>
           <Row gutter={20}>
-            <Col span={6}>
+            <Col span={5}>
               <Form.Item name="q">
                 <Input.Search placeholder="Search products" allowClear={true} />
               </Form.Item>
             </Col>
-            <Col span={6}>
+            <Col span={5}>
               <Form.Item name="categoryId">
                 <Select
                   style={{ width: "100%" }}
@@ -62,7 +62,7 @@ function ProductFilter({ children }: ProductFilterProps) {
               </Form.Item>
             </Col>
             {user!.role === "admin" && (
-              <Col span={6}>
+              <Col span={5}>
                 <Form.Item name="tenantId">
                   <Select
                     style={{ width: "100%" }}
@@ -82,10 +82,10 @@ function ProductFilter({ children }: ProductFilterProps) {
                 </Form.Item>
               </Col>
             )}
-            <Col span={6}>
+            <Col span={8}>
               <Space>
                 <Form.Item name="isPublish">
-                  <Switch defaultChecked={false} />
+                  <Switch defaultChecked={false} checkedChildren="Yes" unCheckedChildren="No"/>
                 </Form.Item>
                 <Typography.Text
                   strong

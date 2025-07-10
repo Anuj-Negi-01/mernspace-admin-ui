@@ -9,6 +9,8 @@ import {
   Image,
   Tag,
   Spin,
+  Drawer,
+  theme,
 } from "antd";
 import { RightOutlined, PlusOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
@@ -21,6 +23,7 @@ import { CURRENT_PAGE, PER_PAGE } from "../../constant";
 import { format } from "date-fns";
 import { debounce } from "lodash";
 import { useAuthStore } from "../../store";
+import ProductForm from "./forms/ProductForm";
 
 const columns = [
   {
@@ -34,9 +37,7 @@ const columns = [
             <Image
               width={60}
               src={
-                // record.image ||
-                // TODO: Remove this hardcoded image
-                "https://imgs.search.brave.com/RcI131a7lnWVoalVpRfxIdmKTVdD4RWaIXHZFCxvhfI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/Y3JlYXRlLnZpc3Rh/LmNvbS9hcGkvbWVk/aWEvc21hbGwvMjc4/Mzg3MzQ0L3N0b2Nr/LXBob3RvLXRvcC12/aWV3LW9mLWhvbWVt/YWRlLWl0YWxpYW4t/cGl6emEtbWFyZ2hl/cml0YS1vbi1vbGQt/d29vZGVuLXRhYmxl"
+                record.image
               }
               preview={false}
             />
@@ -83,13 +84,20 @@ const columns = [
 
 function Products() {
   const [filterForm] = Form.useForm();
+  const [form] = Form.useForm();
 
-  const { user } = useAuthStore()
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const {
+    token: { colorBgLayout },
+  } = theme.useToken();
+
+  const { user } = useAuthStore();
 
   const [queryParams, setQueryParams] = useState({
     currentPage: CURRENT_PAGE,
     perPage: PER_PAGE,
-    tenantId: user!.role === "manager" ? user?.tenant?.id : undefined
+    tenantId: user!.role === "manager" ? user?.tenant?.id : undefined,
   });
 
   const debouncedQUpdate = useMemo(() => {
@@ -97,29 +105,28 @@ function Products() {
       setQueryParams((prev) => ({
         ...prev,
         q: value,
-        currentPage: 1
-      }))
-    }, 1000)
-  }, [])
+        currentPage: 1,
+      }));
+    }, 1000);
+  }, []);
 
   const onFilterChange = (changedFields: FieldData[]) => {
-    const changedFilterFields = changedFields.map((item) => (
-      {[item.name[0]]: item.value }
-    )).reduce((acc, item) => ({...acc, ...item}), {})
+    const changedFilterFields = changedFields
+      .map((item) => ({ [item.name[0]]: item.value }))
+      .reduce((acc, item) => ({ ...acc, ...item }), {});
 
-    if("q" in changedFilterFields){
-      debouncedQUpdate(changedFilterFields.q)
+    if ("q" in changedFilterFields) {
+      debouncedQUpdate(changedFilterFields.q);
     } else {
-      setQueryParams((prev) => (
-        {
-          ...prev,
-          ...changedFilterFields,
-          currentPage: 1
-        }
-      )
-    )
+      setQueryParams((prev) => ({
+        ...prev,
+        ...changedFilterFields,
+        currentPage: 1,
+      }));
     }
   };
+
+  const onHandleSubmit = () => {};
 
   const {
     data: products,
@@ -164,7 +171,11 @@ function Products() {
 
       <Form form={filterForm} onFieldsChange={onFilterChange}>
         <ProductFilter>
-          <Button type="primary" icon={<PlusOutlined />}>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setDrawerOpen(true)}
+          >
             Add Product
           </Button>
         </ProductFilter>
@@ -210,6 +221,38 @@ function Products() {
           },
         }}
       />
+
+      <Drawer
+        title="Create a new Product"
+        width={720}
+        destroyOnHidden
+        closable
+        styles={{ body: { background: colorBgLayout } }}
+        open={drawerOpen}
+        onClose={() => {
+          form.resetFields();
+          setDrawerOpen(false);
+        }}
+        extra={
+          <Space>
+            <Button
+              onClick={() => {
+                form.resetFields();
+                setDrawerOpen(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button type="primary" onClick={onHandleSubmit}>
+              Submit
+            </Button>
+          </Space>
+        }
+      >
+        <Form layout="vertical" form={form}>
+          <ProductForm />
+        </Form>
+      </Drawer>
     </>
   );
 }

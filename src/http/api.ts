@@ -32,3 +32,5 @@ export const updateTenant = (tenant: CreateTenantData, id: number) =>
 export const getCategories = () => api.get(`${CATALOG_SERVICE}/categories`);
 
 export const getProducts = (queryString: string) => api.get(`${CATALOG_SERVICE}/products?${queryString}`);
+
+export const getCategory = (categoryId: string) => api.get(`${CATALOG_SERVICE}/categories/${categoryId}`)

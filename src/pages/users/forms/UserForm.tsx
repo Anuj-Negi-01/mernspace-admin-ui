@@ -7,7 +7,7 @@ function UserForm({ isEditMode = false }: { isEditMode: boolean }) {
   const selectedRole = Form.useWatch('role')
   const { data: tenants } = useQuery({
     queryKey: ["tenants"],
-    queryFn: () => {
+    queryFn: async () => {
       return getTenants(`perPage=100&currentPage=1`).then((res) => res.data);
     },
   });
