@@ -161,7 +161,7 @@ function ProductForm() {
           {
             selectedCategory && (
               
-                <Attributes />
+                <Attributes selectedCategory={selectedCategory}/>
               
             )
           }

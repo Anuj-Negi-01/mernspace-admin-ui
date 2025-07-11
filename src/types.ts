@@ -44,10 +44,18 @@ export interface priceConfiguration {
   };
 }
 
+export interface Attribute {
+  name: string;
+  widgetType: "switch" | "radio";
+  defaultValue: string;
+  availableOptions: string[];
+}
+
 export type Category = {
   _id: string;
   name: string;
   priceConfiguration: priceConfiguration;
+  attributes: Attribute[];
 };
 
 export type Product = {
