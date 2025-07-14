@@ -146,7 +146,7 @@ function Products() {
     placeholderData: keepPreviousData,
   });
 
-  const { mutate: productMutate } = useMutation({
+  const { mutate: productMutate, isPending: isCreateLoading } = useMutation({
     mutationKey: ["product"],
     mutationFn: async (data: FormData) => {
       return createProduct(data).then((res) => res.data);
@@ -295,7 +295,7 @@ function Products() {
             >
               Cancel
             </Button>
-            <Button type="primary" onClick={onHandleSubmit}>
+            <Button type="primary" onClick={onHandleSubmit}loading={isCreateLoading}>
               Submit
             </Button>
           </Space>
