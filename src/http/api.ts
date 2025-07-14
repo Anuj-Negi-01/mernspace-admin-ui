@@ -31,6 +31,15 @@ export const updateTenant = (tenant: CreateTenantData, id: number) =>
 
 export const getCategories = () => api.get(`${CATALOG_SERVICE}/categories`);
 
-export const getProducts = (queryString: string) => api.get(`${CATALOG_SERVICE}/products?${queryString}`);
+export const getProducts = (queryString: string) =>
+  api.get(`${CATALOG_SERVICE}/products?${queryString}`);
 
-export const getCategory = (categoryId: string) => api.get(`${CATALOG_SERVICE}/categories/${categoryId}`)
+export const getCategory = (categoryId: string) =>
+  api.get(`${CATALOG_SERVICE}/categories/${categoryId}`);
+
+export const createProduct = (data: FormData) =>
+  api.post(`${CATALOG_SERVICE}/products`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });

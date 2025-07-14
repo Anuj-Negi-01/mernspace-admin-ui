@@ -16,14 +16,20 @@ import { RightOutlined, PlusOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import ProductFilter from "./ProductFilter";
 import type { FieldData, Product } from "../../types";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getProducts } from "../../http/api";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { createProduct, getProducts } from "../../http/api";
 import { useMemo, useState } from "react";
 import { CURRENT_PAGE, PER_PAGE } from "../../constant";
 import { format } from "date-fns";
 import { debounce } from "lodash";
 import { useAuthStore } from "../../store";
 import ProductForm from "./forms/ProductForm";
+import { makeFormData } from "./helper";
 
 const columns = [
   {
@@ -34,13 +40,7 @@ const columns = [
       return (
         <div>
           <Space>
-            <Image
-              width={60}
-              src={
-                record.image
-              }
-              preview={false}
-            />
+            <Image width={60} src={record.image} preview={false} />
             <Typography.Text>{record.name}</Typography.Text>
           </Space>
         </div>
@@ -83,6 +83,7 @@ const columns = [
 ];
 
 function Products() {
+  const queryClient = useQueryClient();
   const [filterForm] = Form.useForm();
   const [form] = Form.useForm();
 
@@ -126,8 +127,6 @@ function Products() {
     }
   };
 
-  const onHandleSubmit = () => {};
-
   const {
     data: products,
     isFetching,
@@ -146,6 +145,59 @@ function Products() {
     },
     placeholderData: keepPreviousData,
   });
+
+  const { mutate: productMutate } = useMutation({
+    mutationKey: ["product"],
+    mutationFn: async (data: FormData) => {
+      return createProduct(data).then((res) => res.data);
+    },
+    onSuccess: async () => {
+      queryClient.invalidateQueries({
+        queryKey: ["products"],
+      });
+      form.resetFields();
+      setDrawerOpen(false);
+      return;
+    },
+  });
+
+  const onHandleSubmit = async () => {
+    await form.validateFields();
+    const priceConfiguration = form.getFieldValue("priceConfiguration");
+    const pricing = Object.entries(priceConfiguration).reduce(
+      (acc, [key, value]) => {
+        const parsedKey = JSON.parse(key);
+
+        return {
+          ...acc,
+          [parsedKey.configurationKey]: {
+            priceType: parsedKey.priceType,
+            availableOptions: value,
+          },
+        };
+      },
+      {}
+    );
+    const attributes = Object.entries(form.getFieldValue("attributes")).map(
+      ([key, value]) => {
+        return {
+          name: key,
+          value,
+        };
+      }
+    );
+
+    const postData = {
+      ...form.getFieldsValue(),
+      isPublish: form.getFieldValue("isPublish") || false,
+      priceConfiguration: pricing,
+      attributes,
+    };
+
+    const formData = makeFormData(postData);
+
+    await productMutate(formData);
+  };
 
   return (
     <>

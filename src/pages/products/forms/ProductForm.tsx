@@ -9,13 +9,13 @@ import {
   Space,
   Switch,
   Typography,
-  Upload,
 } from "antd";
 import { getCategories, getTenants } from "../../../http/api";
 import type { Category, Tenant } from "../../../types";
-import { PlusOutlined } from "@ant-design/icons";
+
 import Pricing from "./Pricing";
 import Attributes from "./Attributes";
+import ProductImage from "./ProductImage";
 
 function ProductForm() {
   const { data: categories } = useQuery({
@@ -103,25 +103,7 @@ function ProductForm() {
             </Row>
           </Card>
           <Card title="Product image">
-            <Form.Item
-              label="Image"
-              name="image"
-              rules={[
-                {
-                  required: true,
-                  message: "Product image is required",
-                },
-              ]}
-            >
-              <Upload listType="picture-card">
-                <Space direction="vertical">
-                  <PlusOutlined />
-                  <Typography.Text strong style={{ marginTop: 4 }}>
-                    Upload
-                  </Typography.Text>
-                </Space>
-              </Upload>
-            </Form.Item>
+            <ProductImage />
           </Card>
           <Card title="Tenant info">
             <Col span={12}>

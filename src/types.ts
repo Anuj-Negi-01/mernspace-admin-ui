@@ -66,3 +66,11 @@ export type Product = {
   category: Category;
   image: string;
 };
+
+export type ImageField = {
+  file: File;
+};
+
+export type CreateProductData = Product & {
+  image: ImageField;
+};
