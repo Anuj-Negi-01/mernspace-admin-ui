@@ -16,8 +16,10 @@ import type { Category, Tenant } from "../../../types";
 import Pricing from "./Pricing";
 import Attributes from "./Attributes";
 import ProductImage from "./ProductImage";
+import { useAuthStore } from "../../../store";
 
 function ProductForm() {
+  const { user } = useAuthStore();
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
@@ -32,7 +34,7 @@ function ProductForm() {
     },
   });
 
-  const selectedCategory: string = Form.useWatch("categoryId")
+  const selectedCategory: string = Form.useWatch("categoryId");
 
   return (
     <Row>
@@ -105,48 +107,40 @@ function ProductForm() {
           <Card title="Product image">
             <ProductImage />
           </Card>
-          <Card title="Tenant info">
-            <Col span={12}>
-              <Form.Item
-                name="tenantId"
-                label="Restaurant"
-                rules={[
-                  {
-                    required: true,
-                    message: "Restaurant is required",
-                  },
-                ]}
-              >
-                <Select
-                  size="large"
-                  style={{ width: "100%" }}
-                  allowClear={true}
-                  placeholder="Select Tenant"
+          {user?.role === "admin" && (
+            <Card title="Tenant info">
+              <Col span={12}>
+                <Form.Item
+                  name="tenantId"
+                  label="Restaurant"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Restaurant is required",
+                    },
+                  ]}
                 >
-                  {tenants &&
-                    tenants.data.map((tenant: Tenant) => (
-                      <Select.Option value={tenant.id} key={tenant.id}>
-                        {tenant.name}
-                      </Select.Option>
-                    ))}
-                </Select>
-              </Form.Item>
-            </Col>
-          </Card>
-          {
-            selectedCategory && (
-              
-                <Pricing selectedCategory={selectedCategory}/>
-              
-            )
-          }
-          {
-            selectedCategory && (
-              
-                <Attributes selectedCategory={selectedCategory}/>
-              
-            )
-          }
+                  <Select
+                    size="large"
+                    style={{ width: "100%" }}
+                    allowClear={true}
+                    placeholder="Select Tenant"
+                  >
+                    {tenants &&
+                      tenants.data.map((tenant: Tenant) => (
+                        <Select.Option value={tenant.id} key={tenant.id}>
+                          {tenant.name}
+                        </Select.Option>
+                      ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Card>
+          )}
+          {selectedCategory && <Pricing selectedCategory={selectedCategory} />}
+          {selectedCategory && (
+            <Attributes selectedCategory={selectedCategory} />
+          )}
           <Card title="Other properties">
             <Row gutter={20}>
               <Col span={12}>

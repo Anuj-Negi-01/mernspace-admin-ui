@@ -189,6 +189,7 @@ function Products() {
 
     const postData = {
       ...form.getFieldsValue(),
+      tenantId: form.getFieldValue("tenantId") || user?.tenant?.id,
       isPublish: form.getFieldValue("isPublish") || false,
       priceConfiguration: pricing,
       attributes,
