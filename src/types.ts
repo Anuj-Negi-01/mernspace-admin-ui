@@ -37,7 +37,7 @@ export type FieldData = {
   value?: string;
 };
 
-export interface priceConfiguration {
+export interface PriceConfiguration {
   [key: string]: {
     priceType: "base" | "additional";
     availableOptions: string[];
@@ -54,8 +54,13 @@ export interface Attribute {
 export type Category = {
   _id: string;
   name: string;
-  priceConfiguration: priceConfiguration;
+  priceConfiguration: PriceConfiguration;
   attributes: Attribute[];
+};
+
+export type ProductAttribute = {
+  name: string;
+  value: string | boolean;
 };
 
 export type Product = {
@@ -65,6 +70,8 @@ export type Product = {
   isPublish: boolean;
   category: Category;
   image: string;
+  priceConfiguration: PriceConfiguration;
+  attributes: ProductAttribute[];
 };
 
 export type ImageField = {

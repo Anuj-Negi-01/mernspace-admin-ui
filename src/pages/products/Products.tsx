@@ -22,8 +22,8 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { createProduct, getProducts } from "../../http/api";
-import { useMemo, useState } from "react";
+import { createProduct, getProducts, updateProduct } from "../../http/api";
+import { useEffect, useMemo, useState } from "react";
 import { CURRENT_PAGE, PER_PAGE } from "../../constant";
 import { format } from "date-fns";
 import { debounce } from "lodash";
@@ -85,6 +85,7 @@ const columns = [
 function Products() {
   const queryClient = useQueryClient();
   const [filterForm] = Form.useForm();
+  const [selectedProduct , setSelectedProduct] = useState<Product | null>(null)
   const [form] = Form.useForm();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -149,7 +150,11 @@ function Products() {
   const { mutate: productMutate, isPending: isCreateLoading } = useMutation({
     mutationKey: ["product"],
     mutationFn: async (data: FormData) => {
-      return createProduct(data).then((res) => res.data);
+      if(!selectedProduct){
+        return createProduct(data).then((res) => res.data);
+      } else {
+        return updateProduct(data, selectedProduct._id).then((res) => res.data)
+      }
     },
     onSuccess: async () => {
       queryClient.invalidateQueries({
@@ -200,6 +205,35 @@ function Products() {
     await productMutate(formData);
   };
 
+  useEffect(() => {
+    if(selectedProduct){
+      setDrawerOpen(true)
+      const priceConfiguration = Object.entries(selectedProduct.priceConfiguration).reduce((acc,  [key, value]) => {
+        const stringifiedKey = JSON.stringify({
+          configurationKey: key,
+          priceType: value.priceType
+        })
+        return {
+          ...acc,
+          [stringifiedKey]: value.availableOptions
+        }
+      }, {})
+
+      const attributes = selectedProduct.attributes.reduce((acc, curr) => {
+        return {
+          ...acc,
+          [curr.name]: curr.value
+        } 
+      }, {})
+
+      form.setFieldsValue({
+        ...selectedProduct,
+        priceConfiguration,
+        attributes,
+      })
+    }
+  }, [selectedProduct, form])
+
   return (
     <>
       <Flex justify="space-between">
@@ -227,7 +261,10 @@ function Products() {
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => setDrawerOpen(true)}
+            onClick={() => {
+              setDrawerOpen(true)
+              setSelectedProduct(null)
+            }}
           >
             Add Product
           </Button>
@@ -243,7 +280,9 @@ function Products() {
             render: (_text: string, record: Product) => {
               return (
                 <Space>
-                  <Button type="link" onClick={() => {}}>
+                  <Button type="link" onClick={() => {
+                    setSelectedProduct(record)
+                  }}>
                     Edit
                   </Button>
                 </Space>
@@ -276,13 +315,16 @@ function Products() {
       />
 
       <Drawer
-        title="Create a new Product"
+        title={
+          selectedProduct ? "Update product" : "Create a new Product"
+        }
         width={720}
         destroyOnHidden
         closable
         styles={{ body: { background: colorBgLayout } }}
         open={drawerOpen}
         onClose={() => {
+          setSelectedProduct(null)
           form.resetFields();
           setDrawerOpen(false);
         }}
@@ -290,6 +332,7 @@ function Products() {
           <Space>
             <Button
               onClick={() => {
+                setSelectedProduct(null)
                 form.resetFields();
                 setDrawerOpen(false);
               }}
@@ -303,7 +346,7 @@ function Products() {
         }
       >
         <Form layout="vertical" form={form}>
-          <ProductForm />
+          <ProductForm form={form}/>
         </Form>
       </Drawer>
     </>

@@ -9,6 +9,7 @@ import {
   Space,
   Switch,
   Typography,
+  type FormInstance,
 } from "antd";
 import { getCategories, getTenants } from "../../../http/api";
 import type { Category, Tenant } from "../../../types";
@@ -18,7 +19,7 @@ import Attributes from "./Attributes";
 import ProductImage from "./ProductImage";
 import { useAuthStore } from "../../../store";
 
-function ProductForm() {
+function ProductForm({form}: { form: FormInstance }) {
   const { user } = useAuthStore();
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -105,7 +106,7 @@ function ProductForm() {
             </Row>
           </Card>
           <Card title="Product image">
-            <ProductImage />
+            <ProductImage initialImage={form.getFieldValue('image')}/>
           </Card>
           {user?.role === "admin" && (
             <Card title="Tenant info">
@@ -128,7 +129,7 @@ function ProductForm() {
                   >
                     {tenants &&
                       tenants.data.map((tenant: Tenant) => (
-                        <Select.Option value={tenant.id} key={tenant.id}>
+                        <Select.Option value={String(tenant.id)} key={tenant.id}>
                           {tenant.name}
                         </Select.Option>
                       ))}

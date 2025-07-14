@@ -2,10 +2,10 @@ import { Form, message, Space, Typography, Upload, type UploadProps } from "antd
 import { PlusOutlined } from "@ant-design/icons";
 import { useState } from "react";
 
-function ProductImage() {
+function ProductImage({ initialImage }: { initialImage: string | null }) {
 
     const [ messageApi, contextHolder ] = message.useMessage()
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(initialImage);
 
   const uploaderConfig: UploadProps = {
     multiple: false,
